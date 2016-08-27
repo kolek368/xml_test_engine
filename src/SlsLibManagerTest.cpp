@@ -28,7 +28,7 @@ TEST(SlsLibManager, LoadLibrariesFromPath)
    SlsLibManager Test;
    SLS_STATUS Status;
    const char emptyPath[] = "./testing/empty";
-   //const char nonemptyPath[] = "./testing/libs";
+   const char nonemptyPath[] = "./testing/libs";
 
    // Test empty directory
    EXPECT_EQ(Test.m_LoadedLibs.size(), 0);
@@ -41,12 +41,9 @@ TEST(SlsLibManager, LoadLibrariesFromPath)
    EXPECT_EQ(Test.m_LoadedLibs.size(), 0);
 
    // Test valid directory
-   EXPECT_EQ(Test.m_LoadedLibs.size(), 0);
-   Status = Test.loadLibs();
-   EXPECT_EQ(Status, SLS_INVALID_PATH);
-   Status = Test.setPath(emptyPath);
+   Status = Test.setPath(nonemptyPath);
    EXPECT_EQ(Status, SLS_OK);
    Status = Test.loadLibs();
    EXPECT_EQ(Status, SLS_OK);
-   EXPECT_EQ(Test.m_LoadedLibs.size(), 0);
+   EXPECT_EQ(Test.m_LoadedLibs.size(), 1);
 }
