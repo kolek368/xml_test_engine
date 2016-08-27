@@ -42,39 +42,15 @@ public:
    }
 
    void push(uint8_t byte) {
-      if( (int32_t)(this->m_iStackIdx + sizeof(uint8_t)) >= this->m_iCurrentMaxSize)
-      {
-         std::bad_alloc exception;
-         throw exception;
-      }
-      this->m_pStack[this->m_iStackIdx+1] = byte;
-      this->m_iStackIdx += sizeof(uint8_t);
+      return this->pushn(&byte, sizeof(uint8_t));
    };
 
    void pushw(uint16_t word) {
-      if( (int32_t)(this->m_iStackIdx + sizeof(uint16_t)) >= this->m_iCurrentMaxSize)
-      {
-         std::bad_alloc exception;
-         throw exception;
-      }
-      uint8_t* pTranslator = (uint8_t *)&word;
-      this->m_pStack[this->m_iStackIdx+1] = *pTranslator;
-      this->m_pStack[this->m_iStackIdx+2] = *(pTranslator+1);
-      this->m_iStackIdx += sizeof(uint16_t);
+      return this->pushn((uint8_t *)&word, sizeof(word));
    };
 
    void pushd(uint32_t dword) {
-      if( (int32_t)(this->m_iStackIdx + sizeof(uint32_t)) >= this->m_iCurrentMaxSize)
-      {
-         std::bad_alloc exception;
-         throw exception;
-      }
-      uint8_t* pTranslator = (uint8_t *)&dword;
-      this->m_pStack[this->m_iStackIdx+1] = *pTranslator;
-      this->m_pStack[this->m_iStackIdx+2] = *(pTranslator+1);
-      this->m_pStack[this->m_iStackIdx+3] = *(pTranslator+2);
-      this->m_pStack[this->m_iStackIdx+4] = *(pTranslator+3);
-      this->m_iStackIdx += sizeof(uint32_t);
+      return this->pushn((uint8_t *)&dword, sizeof(dword));
    };
 
    void pushn(uint8_t *nbytes, int32_t nbr) {
@@ -92,56 +68,17 @@ public:
    };
 
    void pop(uint8_t* byte){
-      if(nullptr == byte)
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      if(this->m_iStackIdx < ((int32_t)sizeof(uint8_t)-1))
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      *byte = this->m_pStack[this->m_iStackIdx];
-      this->m_iStackIdx -= sizeof(uint8_t);
+      return this->popn(byte, sizeof(uint8_t));
    };
 
    void popw(uint16_t* word)
    {
-      if(nullptr == word)
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      if(this->m_iStackIdx < ((int32_t)sizeof(uint16_t)-1))
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      uint8_t* pTranslator = (uint8_t *)word;
-      *pTranslator = this->m_pStack[this->m_iStackIdx-1];
-      *(pTranslator+1) = this->m_pStack[this->m_iStackIdx];
-      this->m_iStackIdx -= sizeof(uint16_t);
+      return this->popn((uint8_t*)word, sizeof(uint16_t));
    }
 
    void popd(uint32_t* dword)
    {
-      if(nullptr == dword)
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      if(this->m_iStackIdx < ((int32_t)sizeof(uint16_t)-1))
-      {
-         std::bad_exception exception;
-         throw exception;
-      }
-      uint8_t* pTranslator = (uint8_t *)dword;
-      *pTranslator = this->m_pStack[this->m_iStackIdx-3];
-      *(pTranslator+1) = this->m_pStack[this->m_iStackIdx-2];
-      *(pTranslator+2) = this->m_pStack[this->m_iStackIdx-1];
-      *(pTranslator+3) = this->m_pStack[this->m_iStackIdx];
-      this->m_iStackIdx -= sizeof(uint32_t);
+      return this->popn((uint8_t*)dword, sizeof(uint32_t));
    }
 
    void popn(uint8_t* nbytes, int32_t nbr)
