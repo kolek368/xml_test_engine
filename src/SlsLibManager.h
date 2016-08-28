@@ -8,6 +8,9 @@
 #ifndef SLSLIBMANAGER_H_
 #define SLSLIBMANAGER_H_
 
+#include <dlfcn.h>
+#include <string>
+#include <vector>
 #include <boost/filesystem.hpp>
 #include "SlsLibraryApi.hpp"
 
@@ -20,6 +23,7 @@ public:
    SlsLibs m_LoadedLibs;
 private:
    boost::filesystem::path m_LibsPath;
+   std::vector<void *> m_pOpenedLibs;
 };
 
 #endif /* SLSLIBMANAGER_H_ */
