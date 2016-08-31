@@ -30,6 +30,42 @@ bool SlsProgram::load(const char* path)
    return true;
 }
 
+bool SlsProgram::parseLine(boost::property_tree::ptree::value_type &line)
+{
+   if(std::string(line.first.data()) == "call")
+   {
+      std::cout<< line.first.data() << "::" << line.second.data() <<std::endl;
+      try
+      {
+         boost::property_tree::ptree::assoc_iterator it;
+         it = line.second.find("id");
+         if(it != line.second.not_found())
+         {
+            std::cout << "Id attribute not found" << std::endl;
+         }
+         else
+         {
+            std::cout << "Id attribute found" << std::endl;
+         }
+
+//         BOOST_FOREACH(boost::property_tree::ptree::value_type &w, line.second.get_child("<xmlattr>"))
+//         {
+//
+//         }
+      }
+      catch (std::exception& e)
+      {
+         std::cout << "No attributes found." << std::endl;
+         return true;
+      }
+   }
+   else
+   {
+      return false;
+   }
+   return true;
+}
+
 bool SlsProgram::compile(void)
 {
    if(this->m_RawProgram.empty())
@@ -42,17 +78,10 @@ bool SlsProgram::compile(void)
       // TODO generate listing from xml file
       BOOST_FOREACH(boost::property_tree::ptree::value_type &v, this->m_RawProgram.get_child("sls_script"))
       {
-         std::cout<< v.first.data() << std::endl;
-         try
+         bool result = parseLine(v);
+         if(false == result)
          {
-            BOOST_FOREACH(boost::property_tree::ptree::value_type &w, v.second.get_child("<xmlattr>"))
-            {
-               std::cout << "Attribute: " << w.first.data() << std::endl;
-            }
-         }
-         catch (std::exception& e)
-         {
-            continue;
+            return result;
          }
       }
    }

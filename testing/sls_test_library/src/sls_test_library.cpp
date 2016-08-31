@@ -5,6 +5,8 @@
  *      Author: ares
  */
 
+#include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include "SlsLibraryApi.hpp"
@@ -13,36 +15,67 @@
 
 using namespace std;
 
-SLS_STATUS TestFunPrintMsg(SlsStack *stack)
+extern "C" SLS_STATUS TestFunPrintMsg(SlsStack *stack)
 {
+   uint16_t msgSize;
    SLS_STATUS Status = SLS_OK;
+   stack->popw(&msgSize);
+   uint8_t *msg = new uint8_t[msgSize];
+   stack->popn(msg, msgSize);
+   cout << msg << endl;
+   delete msg;
    return Status;
 }
 
-SLS_STATUS TestFunPrintAdd(SlsStack *stack)
+extern "C" SLS_STATUS TestFunPrintAdd(SlsStack *stack)
 {
+   uint32_t a;
+   uint32_t b;
+   uint32_t result;
    SLS_STATUS Status = SLS_OK;
+   stack->popd(&a);
+   stack->popd(&b);
+   result = a + b;
+   stack->pushd(result);
+   cout << "a + b = " << result << endl;
    return Status;
 }
 
-SLS_STATUS TestFunFillArray(SlsStack *stack)
+extern "C" SLS_STATUS TestFunFillArray(SlsStack *stack)
 {
    SLS_STATUS Status = SLS_OK;
+   uint8_t *arrayPtr;
+   uint8_t size;
+   stack->popn((uint8_t *)&arrayPtr, sizeof(arrayPtr));
+   stack->pop(&size);
+   printf("Array pointer: %X \r\n", arrayPtr);
+   for(uint8_t i = 0; i < size; i++)
+   {
+      arrayPtr[i] = i;
+   }
    return Status;
 }
 
-SLS_STATUS TestFunReadArray(SlsStack *stack)
+extern "C" SLS_STATUS TestFunReadArray(SlsStack *stack)
 {
    SLS_STATUS Status = SLS_OK;
+   uint8_t *arrayPtr;
+   uint8_t size;
+   stack->popn((uint8_t *)&arrayPtr, sizeof(arrayPtr));
+   stack->pop(&size);
+   for(uint8_t i = 0; i < size; i++)
+   {
+      std::cout << "Element[" << i << "] = " << arrayPtr[i] << std::endl;
+   }
    return Status;
 }
 
-std::string GetLibraryNamespace(void)
+extern "C" std::string GetLibraryNamespace(void)
 {
    return std::string(LibraryNamespace);
 }
 
-SLS_STATUS GetApiList(SlsLibApi *api)
+extern "C" SLS_STATUS GetApiList(SlsLibApi *api)
 {
    SLS_STATUS Status = SLS_OK;
    api->clear();

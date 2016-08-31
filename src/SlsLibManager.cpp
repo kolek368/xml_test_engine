@@ -40,26 +40,18 @@ SLS_STATUS SlsLibManager::loadLibs(void)
       SlsLibApi tmpApi;
       if(it->path().filename().extension() == SHARED_LIB_EXTENSION)
       {
-         /* on Linux, use "./myclass.so" */
          void* handle = dlopen(it->path().c_str(), RTLD_LAZY);
          if(NULL != handle)
          {
             SLS_STATUS (*GetApiList)(SlsLibApi *api);
             GetApiList = (SLS_STATUS (*)(SlsLibApi *))dlsym(handle, "GetApiList");
             if(NULL == GetApiList) {
-               printf("%s\n", dlerror());
+               std::cout << dlerror() << std::endl;
                dlclose(handle);
             }
             else
             {
                GetApiList(&tmpApi);
-               for(std::map<std::string, sls_lib_function>::iterator it2 = tmpApi.begin(); it2 != tmpApi.end(); it2++)
-               {
-                  std::cout << it2->first << std::endl;
-                  sls_lib_function tmpFunPtr = (sls_lib_function)dlsym(handle, it2->first.c_str());
-                  std::cout << it2->first << " " << std::hex << GetApiList << std::endl;
-                  tmpApi[it2->first] = tmpFunPtr;
-               }
                this->m_pOpenedLibs.push_back(handle);
                this->m_LoadedLibs.insert(SlsLib(it->path().filename().c_str(), tmpApi));
             }

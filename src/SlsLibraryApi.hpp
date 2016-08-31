@@ -7,6 +7,7 @@
 
 #ifndef SLSLIBRARYAPI_HPP_
 #define SLSLIBRARYAPI_HPP_
+#include <exception>
 #include <map>
 #include <string>
 #include "SlsStack.hpp"

@@ -11,6 +11,20 @@
 #include <cstdint>
 #include <exception>
 
+class SlsException : public std::exception
+{
+public:
+   SlsException(std::string what = "SlsException")
+   {
+      this->m_What = what;
+   };
+   virtual const char* what() const throw()
+   {
+      return this->m_What.c_str();
+   }
+private:
+   std::string m_What;
+};
 
 class SlsStack
 {
@@ -19,7 +33,7 @@ public:
    {
       if(this->m_MAX_SIZE < size)
       {
-         std::bad_alloc exception;
+         SlsException exception("Stack size exceeds max stack size.");
          throw exception;
       }
       else
@@ -56,7 +70,7 @@ public:
    void pushn(uint8_t *nbytes, int32_t nbr) {
       if( (int32_t)(this->m_iStackIdx + nbr) >= this->m_iCurrentMaxSize)
       {
-         std::bad_alloc exception;
+         SlsException exception("Not enough memory left.");
          throw exception;
       }
       uint8_t* pTranslator = (uint8_t *)nbytes;
@@ -85,12 +99,12 @@ public:
    {
       if(nullptr == nbytes)
       {
-         std::bad_exception exception;
+         SlsException exception("Invalid pointer.");
          throw exception;
       }
       if(this->m_iStackIdx < (nbr-1))
       {
-         std::bad_exception exception;
+         SlsException exception("Insufficient number of bytes on stack.");
          throw exception;
       }
       uint8_t* pTranslator = (uint8_t *)nbytes;

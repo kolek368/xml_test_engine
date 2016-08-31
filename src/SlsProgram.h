@@ -24,7 +24,9 @@ public:
 private:
    bool load(const char* path);
    bool compile(void);
+   bool parseLine(boost::property_tree::ptree::value_type &line);
    boost::property_tree::ptree m_RawProgram;
+   const std::vector<std::string> m_KeyWords;
 };
 
 #endif /* SLSPROGRAM_H_ */

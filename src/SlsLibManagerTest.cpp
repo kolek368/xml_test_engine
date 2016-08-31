@@ -58,29 +58,11 @@ TEST(SlsLibManager, GetApiFromLibrary)
    Test.setPath(nonemptyPath);
    Status = Test.loadLibs();
    EXPECT_EQ(Status, SLS_OK);
-   for(std::map<std::string, SlsLibApi>::iterator it = Test.m_LoadedLibs.begin(); it != Test.m_LoadedLibs.end(); it++)
-   {
-      EXPECT_EQ(it->second.size(), 4);
-      for(std::map<std::string, sls_lib_function>::iterator it2 = it->second.begin(); it2 != it->second. end(); it2++)
-      {
-         std::cout << it2->first << " ptr: " << std::hex << it2->second <<std::endl;
-         if(it2->first == "TestFunPrintMsg")
-         {
-            std::cout << "To jest to!" << std::endl;
-            uint8_t testMsg[] = "Hello fun fromdynamic loaded lib!\n";
-            uint16_t testMsgSize = sizeof(testMsg);
-            SlsStack testStack(128);
-            testStack.pushn(testMsg, sizeof(testMsg));
-            testStack.pushw(testMsgSize);
-            Status = it2->second(&testStack);
-         }
-      }
-      /*
-      uint8_t testMsg[] = "Hello fun fromdynamic loaded lib!\n";
-      SlsStack testStack(128);
-      testStack.pushn(testMsg, sizeof(testMsg));
-      it->second["TestFunPrintMsg"](&testStack);
-      */
-   }
-
+   uint8_t testMsg[] = "Hello fun fromdynamic loaded lib!\n";
+   uint16_t testMsgSize = sizeof(testMsg);
+   SlsStack testStack(128);
+   EXPECT_THROW(Test.m_LoadedLibs["libsls_test_library.so"]["TestFunPrintMsg"](&testStack), std::bad_exception);
+   testStack.pushn(testMsg, sizeof(testMsg));
+   testStack.pushw(testMsgSize);
+   EXPECT_NO_THROW(Test.m_LoadedLibs["libsls_test_library.so"]["TestFunPrintMsg"](&testStack));
 }

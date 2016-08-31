@@ -16,7 +16,7 @@ TEST(SlsStack, CreateVariableSizeStacks)
 {
    EXPECT_NO_THROW(SlsStack testStack1);
    EXPECT_NO_THROW(SlsStack testStack2(2048));
-   EXPECT_THROW(SlsStack testStack3(4097), std::bad_alloc);
+   EXPECT_THROW(SlsStack testStack3(4097), SlsException);
 }
 
 TEST(SlsStack, StoreDataOnStack)
@@ -27,10 +27,10 @@ TEST(SlsStack, StoreDataOnStack)
    EXPECT_NO_THROW(testStack1.pushw(0x0102));
    EXPECT_NO_THROW(testStack1.pushd(0x01020304));
    EXPECT_NO_THROW(testStack1.pushn(testArray, 5));
-   EXPECT_THROW(testStack1.push(0x01), std::bad_alloc);
-   EXPECT_THROW(testStack1.pushw(0x0102), std::bad_alloc);
-   EXPECT_THROW(testStack1.pushd(0x01020304), std::bad_alloc);
-   EXPECT_THROW(testStack1.pushn(testArray, 5), std::bad_alloc);
+   EXPECT_THROW(testStack1.push(0x01), SlsException);
+   EXPECT_THROW(testStack1.pushw(0x0102), SlsException);
+   EXPECT_THROW(testStack1.pushd(0x01020304), SlsException);
+   EXPECT_THROW(testStack1.pushn(testArray, 5), SlsException);
 }
 
 TEST(SlsStack, GetDataFromStackUint8)
@@ -39,10 +39,10 @@ TEST(SlsStack, GetDataFromStackUint8)
    uint8_t testByte;
 
    testStack1.push(0x01);
-   EXPECT_THROW(testStack1.pop(nullptr), std::bad_exception);
+   EXPECT_THROW(testStack1.pop(nullptr), SlsException);
    testStack1.pop(&testByte);
    EXPECT_EQ(testByte, 0x01);
-   EXPECT_THROW(testStack1.pop(&testByte), std::bad_exception);
+   EXPECT_THROW(testStack1.pop(&testByte), SlsException);
    for(uint16_t byte = 0xFF; byte > 0x0; (byte >>= 1))
    {
       testStack1.push((uint8_t)byte);
@@ -57,10 +57,10 @@ TEST(SlsStack, GetDataFromStackUint16)
    uint16_t testWord;
 
    testStack1.pushw(0x0102);
-   EXPECT_THROW(testStack1.popw(nullptr), std::bad_exception);
+   EXPECT_THROW(testStack1.popw(nullptr), SlsException);
    testStack1.popw(&testWord);
    EXPECT_EQ(testWord, 0x0102);
-   EXPECT_THROW(testStack1.popw(&testWord), std::bad_exception);
+   EXPECT_THROW(testStack1.popw(&testWord), SlsException);
    for(uint16_t word = 0xFFFF; word > 0; (word >>= 1))
    {
       testStack1.pushw((uint16_t)word);
@@ -75,10 +75,10 @@ TEST(SlsStack, GetDataFromStackUint32)
    uint32_t testDword;
 
    testStack1.pushd(0x01020304);
-   EXPECT_THROW(testStack1.popd(nullptr), std::bad_exception);
+   EXPECT_THROW(testStack1.popd(nullptr), SlsException);
    testStack1.popd(&testDword);
    EXPECT_EQ(testDword, 0x01020304);
-   EXPECT_THROW(testStack1.popd(&testDword), std::bad_exception);
+   EXPECT_THROW(testStack1.popd(&testDword), SlsException);
    for(uint32_t dword = 0xFFFFFFFF; dword > 0; (dword >>= 1))
    {
       testStack1.pushd(dword);
@@ -94,10 +94,10 @@ TEST(SlsStack, GetDataFromStackUintNBytes)
    uint8_t testArray2[] = {0x01, 0x02, 0x03, 0x04, 0x05};
 
    testStack1.pushn(testArray1, sizeof(testArray1));
-   EXPECT_THROW(testStack1.popn(nullptr, 0), std::bad_exception);
+   EXPECT_THROW(testStack1.popn(nullptr, 0), SlsException);
    testStack1.popn(testArray2, sizeof(testArray2));
    EXPECT_THAT(testArray2, testing::ElementsAre(0x01, 0x02, 0x03, 0x04, 0x05));
-   EXPECT_THROW(testStack1.popn(testArray2, sizeof(testArray2)), std::bad_exception);
+   EXPECT_THROW(testStack1.popn(testArray2, sizeof(testArray2)), SlsException);
 }
 
 TEST(SlsStack, GetDataFromStackVariousSizes)
@@ -113,9 +113,9 @@ TEST(SlsStack, GetDataFromStackVariousSizes)
    }TestStruct;
 
    testStack1.push(0x01);
-   EXPECT_THROW(testStack1.popw(&testWord), std::bad_exception);
-   EXPECT_THROW(testStack1.popd(&testDword), std::bad_exception);
-   EXPECT_THROW(testStack1.popn(testArray1, sizeof(testArray1)), std::bad_exception);
+   EXPECT_THROW(testStack1.popw(&testWord), SlsException);
+   EXPECT_THROW(testStack1.popd(&testDword), SlsException);
+   EXPECT_THROW(testStack1.popn(testArray1, sizeof(testArray1)), SlsException);
 
    TestStruct TestStruct1;
    TestStruct1.a = 0x12;
