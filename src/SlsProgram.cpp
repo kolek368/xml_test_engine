@@ -6,13 +6,18 @@
  */
 #include "SlsProgram.h"
 
-SlsProgram::SlsProgram() {
+SlsProgram::SlsProgram(const char* libPath) {
    // TODO Auto-generated constructor stub
-
+   this->m_ProgramReady = false;
+   this->m_Libs.setPath(libPath);
 }
 
 SlsProgram::~SlsProgram() {
    // TODO Auto-generated destructor stub
+   for(auto& entity : this->m_Program)
+   {
+      delete entity;
+   }
 }
 
 bool SlsProgram::load(const char* path)
@@ -32,26 +37,53 @@ bool SlsProgram::load(const char* path)
 
 bool SlsProgram::parseLine(boost::property_tree::ptree::value_type &line)
 {
-   if(std::string(line.first.data()) == "call")
+   if("call" == std::string(line.first.data()))
    {
-      std::cout<< line.first.data() << "::" << line.second.data() <<std::endl;
       try
       {
-         boost::property_tree::ptree::assoc_iterator it;
-         it = line.second.find("id");
-         if(it != line.second.not_found())
+         bool result = true;
+         SlsCallEntity *programLine = new SlsCallEntity;
+         std::string lib = line.second.get<std::string>("<xmlattr>.lib", "not found");
+         std::string fun = line.second.get<std::string>("<xmlattr>.function", "not found");
+
+         if(0 == this->m_Libs.m_LoadedLibs.count(lib))
          {
-            std::cout << "Id attribute not found" << std::endl;
+            std::cout << "Unknown library: " << lib << std::endl;
+            result = false;
+         }
+         else if(0 == this->m_Libs.m_LoadedLibs[lib].count(fun))
+         {
+            std::cout << "Function: " << fun << " not found in " << lib << " library." << std::endl;
+            result = false;
          }
          else
          {
-            std::cout << "Id attribute found" << std::endl;
-         }
+            std::cout << "lib: " << lib << " - function: " << fun << std::endl;
+            programLine->addParam(this->m_Libs.m_LoadedLibs[lib][fun]);
 
-//         BOOST_FOREACH(boost::property_tree::ptree::value_type &w, line.second.get_child("<xmlattr>"))
-//         {
-//
-//         }
+            for(auto &child : line.second)
+            {
+               if("<xmlattr>" == std::string(child.first.data()))
+                  continue;
+
+               if("param" == std::string(child.first.data()))
+               {
+                  SlsFunParam param(child.second.get<std::string>("<xmlattr>.type", "not found"),  // type of data
+                                    child.second.data());                                          // data in string
+                  programLine->addParam(param);
+               }
+               else
+               {
+                  result = false;
+                  break;
+               }
+            }
+            this->m_Program.push_back(programLine);
+         }
+         if(false == result)
+         {
+            delete programLine;
+         }
       }
       catch (std::exception& e)
       {
@@ -68,6 +100,14 @@ bool SlsProgram::parseLine(boost::property_tree::ptree::value_type &line)
 
 bool SlsProgram::compile(void)
 {
+   SLS_STATUS status = SLS_OK;
+
+   status = this->m_Libs.loadLibs();
+   if(SLS_OK != status)
+   {
+      return false;
+   }
+
    if(this->m_RawProgram.empty())
    {
       std::cout << "No script is loaded." << std::endl;
@@ -94,7 +134,9 @@ bool SlsProgram::compile(void)
 
 bool SlsProgram::build(const char* path)
 {
+   SLS_STATUS status = SLS_OK;
    bool result = false;
+
    result = this->load(path);
    if(false == result)
    {
@@ -105,7 +147,33 @@ bool SlsProgram::build(const char* path)
    {
       return result;
    }
-   // TODO build program from compiled listing
+
+
+   for(auto& entity : this->m_Program)
+   {
+      status = entity->init();
+      if(SLS_OK != status)
+      {
+         result = false;
+         break;
+      }
+   }
+
+   if(true == result)
+   {
+      this->m_ProgramReady = true;
+   }
+
    return result;
 }
 
+void SlsProgram::run(void)
+{
+   if(true == this->m_ProgramReady)
+   {
+      for(auto& entity : this->m_Program)
+      {
+         entity->execute();
+      }
+   }
+}

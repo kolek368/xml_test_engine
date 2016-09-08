@@ -18,7 +18,7 @@ class SlsLibManager {
 public:
    SlsLibManager();
    ~SlsLibManager();
-   SLS_STATUS setPath(const char* libsDirectoryPath);
+   SLS_STATUS setPath(const char* libsDirectoryPath = "./czy/to/dziala");
    SLS_STATUS loadLibs(void);
    SlsLibs m_LoadedLibs;
 private:

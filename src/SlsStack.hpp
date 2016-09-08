@@ -29,7 +29,7 @@ private:
 class SlsStack
 {
 public:
-   SlsStack(int32_t size = 0)
+   SlsStack(int32_t size = 256)
    {
       if(this->m_MAX_SIZE < size)
       {

@@ -8,25 +8,32 @@
 #ifndef SLSPROGRAM_H_
 #define SLSPROGRAM_H_
 
-#include <string>
 #include <exception>
+#include <string>
+#include <vector>
 #include <boost/foreach.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include "SlsLibraryApi.hpp"
+#include "SlsLibManager.h"
+#include "SlsScriptEntity.hpp"
 
 class SlsProgram
 {
 public:
-   SlsProgram();
+   SlsProgram(const char* libPath);
    ~SlsProgram();
    bool build(const char* path);
+   void run(void);
 private:
    bool load(const char* path);
    bool compile(void);
    bool parseLine(boost::property_tree::ptree::value_type &line);
    boost::property_tree::ptree m_RawProgram;
-   const std::vector<std::string> m_KeyWords;
+   bool m_ProgramReady;
+   SlsLibManager m_Libs;
+   std::vector<SlsScriptEntity *> m_Program;
 };
 
 #endif /* SLSPROGRAM_H_ */

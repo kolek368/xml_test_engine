@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE sls_script SYSTEM "sls_script.dtd">
 <sls_script>
-	<call id='1' action='read'>Tove</to>
+   <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+      <param type='string'>Hello, sls_engine World!!!</param>
+   </call>
 </sls_script>

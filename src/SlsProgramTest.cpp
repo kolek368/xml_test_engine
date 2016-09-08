@@ -13,38 +13,39 @@
 
 TEST(SlsProgram, LoadXmlTestScriptNotExisting)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    EXPECT_FALSE( test.load("invalid_path_to_some_file") );
 }
 
 TEST(SlsProgram, LoadXmlTestScriptValidExisting)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    EXPECT_TRUE( test.load("./testing/test_xml_valid_file.xml") );
 }
 
 TEST(SlsProgram, CompileXmlTestScriptValid)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    test.load("./testing/test_xml_valid_file.xml");
    EXPECT_TRUE( test.compile() );
 }
 
 TEST(SlsProgram, CompileXmlTestScriptInvalid)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    test.load("./testing/test_xml_invalid_file.xml");
    EXPECT_FALSE( test.compile() );
 }
 
 TEST(SlsProgram, BuildXmlTestScriptValid)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    EXPECT_TRUE( test.build("./testing/test_xml_valid_file.xml") );
+   test.run();
 }
 
 TEST(SlsProgram, BuildXmlTestScriptInvalid)
 {
-   SlsProgram test;
+   SlsProgram test("./testing/libs");
    EXPECT_FALSE( test.build("./testing/test_xml_invalid_file.xml") );
 }

@@ -27,4 +27,6 @@ typedef std::pair<std::string, sls_lib_function> SlsLibFun;
 typedef std::map<std::string, SlsLibApi> SlsLibs;
 typedef std::pair<std::string, SlsLibApi> SlsLib;
 
+typedef std::pair<std::string, std::string> SlsFunParam;
+
 #endif /* SLSLIBRARYAPI_HPP_ */

@@ -58,10 +58,10 @@ TEST(SlsLibManager, GetApiFromLibrary)
    Test.setPath(nonemptyPath);
    Status = Test.loadLibs();
    EXPECT_EQ(Status, SLS_OK);
-   uint8_t testMsg[] = "Hello fun fromdynamic loaded lib!\n";
+   uint8_t testMsg[] = "Hello fun from dynamic loaded lib!\n";
    uint16_t testMsgSize = sizeof(testMsg);
    SlsStack testStack(128);
-   EXPECT_THROW(Test.m_LoadedLibs["libsls_test_library.so"]["TestFunPrintMsg"](&testStack), std::bad_exception);
+   EXPECT_THROW(Test.m_LoadedLibs["libsls_test_library.so"]["TestFunPrintMsg"](&testStack), SlsException);
    testStack.pushn(testMsg, sizeof(testMsg));
    testStack.pushw(testMsgSize);
    EXPECT_NO_THROW(Test.m_LoadedLibs["libsls_test_library.so"]["TestFunPrintMsg"](&testStack));

@@ -22,7 +22,11 @@ extern "C" SLS_STATUS TestFunPrintMsg(SlsStack *stack)
    stack->popw(&msgSize);
    uint8_t *msg = new uint8_t[msgSize];
    stack->popn(msg, msgSize);
-   cout << msg << endl;
+   for(int i = 0; i < msgSize; i++)
+   {
+      cout << msg[i];
+   }
+   cout << endl;
    delete msg;
    return Status;
 }
