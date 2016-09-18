@@ -34,18 +34,6 @@ public:
       return Ret;
    }
 
-   SlsInt operator*(const SlsInt &Other) {
-      SlsInt Ret;
-      Ret.m_Value = this->m_Value * Other.m_Value;
-      return Ret;
-   }
-
-   SlsInt operator/(const SlsInt &Other) {
-      SlsInt Ret;
-      Ret.m_Value = this->m_Value / Other.m_Value;
-      return Ret;
-   }
-
    SlsInt operator-(const SlsInt &Other) {
       SlsInt Ret;
       Ret.m_Value = this->m_Value - Other.m_Value;
@@ -58,8 +46,52 @@ public:
       return Ret;
    }
 
-   bool operator==(const int64_t &Other) {
-      return (this->m_Value == Other);
+   SlsInt operator*(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value * Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator/(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value / Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator%(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value % Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator&(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value & Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator|(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value | Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator^(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value ^ Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator<<(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value << Other.m_Value;
+      return Ret;
+   }
+
+   SlsInt operator>>(const SlsInt &Other) {
+      SlsInt Ret;
+      Ret.m_Value = this->m_Value >> Other.m_Value;
+      return Ret;
    }
 
    bool operator==(const SlsInt &Other) {
@@ -68,6 +100,22 @@ public:
 
    bool operator!=(const SlsInt &Other) {
       return (this->m_Value != Other.m_Value);
+   }
+
+   bool operator>(const SlsInt &Other) {
+      return (this->m_Value > Other.m_Value);
+   }
+
+   bool operator>=(const SlsInt &Other) {
+      return (this->m_Value >= Other.m_Value);
+   }
+
+   bool operator<(const SlsInt &Other) {
+      return (this->m_Value < Other.m_Value);
+   }
+
+   bool operator<=(const SlsInt &Other) {
+      return (this->m_Value <= Other.m_Value);
    }
 
    SlsInt& operator+=(const SlsInt &Other) {
@@ -80,13 +128,43 @@ public:
       return *this;
    }
 
-   SlsInt& operator*=(const int64_t Other) {
-      this->m_Value *= Other;
+   SlsInt& operator*=(const SlsInt Other) {
+      this->m_Value *= Other.m_Value;
       return *this;
    }
 
-   SlsInt& operator/=(const int64_t Other) {
-      this->m_Value /= Other;
+   SlsInt& operator/=(const SlsInt Other) {
+      this->m_Value /= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator%=(const SlsInt Other) {
+      this->m_Value %= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator&=(const SlsInt Other) {
+      this->m_Value &= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator|=(const SlsInt Other) {
+      this->m_Value |= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator^=(const SlsInt Other) {
+      this->m_Value ^= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator<<=(const SlsInt Other) {
+      this->m_Value <<= Other.m_Value;
+      return *this;
+   }
+
+   SlsInt& operator>>=(const SlsInt Other) {
+      this->m_Value >>= Other.m_Value;
       return *this;
    }
 
@@ -102,9 +180,25 @@ public:
          SlsException e("NULL pointer exception");
          throw e;
       }
-      this->m_Value.reset(Initial);
+      this->m_Value.reset(new uint8_t(Size));
+      for(int64_t i = 0; i < Size; i++)
+      {
+         this->m_Value.get()[i] = Initial[i];
+      }
       this->m_Size = Size;
    }
+
+   SLS_STATUS get(int64_t *Size, uint8_t **Value)
+   {
+      if((NULL == Size) || (NULL == Value))
+      {
+         return SLS_PTR_ERROR;
+      }
+      *Size = this->m_Size;
+      *Value = this->m_Value.get();
+      return SLS_OK;
+   }
+
 private:
    int64_t m_Size;
    std::shared_ptr<uint8_t> m_Value;

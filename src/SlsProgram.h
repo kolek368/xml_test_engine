@@ -18,6 +18,7 @@
 #include "SlsLibraryApi.hpp"
 #include "SlsLibManager.h"
 #include "SlsScriptEntity.hpp"
+#include "SlsVariable.hpp"
 
 class SlsProgram
 {
@@ -30,10 +31,13 @@ private:
    bool load(const char* path);
    bool compile(void);
    bool parseLine(boost::property_tree::ptree::value_type &line);
+   bool parseCall(boost::property_tree::ptree::value_type &line);
+   bool parseSet(boost::property_tree::ptree::value_type &line);
    boost::property_tree::ptree m_RawProgram;
    bool m_ProgramReady;
    SlsLibManager m_Libs;
    std::vector<SlsScriptEntity *> m_Program;
+   SlsVarContainer m_Variables;
 };
 
 #endif /* SLSPROGRAM_H_ */
