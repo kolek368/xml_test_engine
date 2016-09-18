@@ -52,7 +52,7 @@ extern "C" SLS_STATUS TestFunFillArray(SlsStack *stack)
    uint8_t size;
    stack->popn((uint8_t *)&arrayPtr, sizeof(arrayPtr));
    stack->pop(&size);
-   printf("Array pointer: %X \r\n", arrayPtr);
+   printf("Array pointer: %lX \r\n", (unsigned long int)arrayPtr);
    for(uint8_t i = 0; i < size; i++)
    {
       arrayPtr[i] = i;

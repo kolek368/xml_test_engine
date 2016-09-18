@@ -14,12 +14,8 @@
 
 class SlsScriptEntity {
 public:
-   SlsScriptEntity() {
-
-   };
-   virtual ~SlsScriptEntity(){
-
-   };
+   SlsScriptEntity() { };
+   virtual ~SlsScriptEntity(){ };
    virtual SLS_STATUS init(void) {
       return SLS_OK;
    };
