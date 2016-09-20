@@ -114,8 +114,13 @@ bool SlsProgram::parseSet(boost::property_tree::ptree::value_type &line)
       if("Integer" == type)
       {
          int64_t iValue = std::stoi(value);
-         std::cout << iValue << std::endl;
+         std::cout << "Adding Integer value: " << iValue << std::endl;
          this->m_Variables.insert( SlsVar(name, std::shared_ptr<SlsInt>(new SlsInt(iValue))) );
+      }
+      else if("String" == type)
+      {
+         std::cout << "Adding String value: " << value << " Length: " << value.length() << std::endl;
+         //this->m_Variables.insert( SlsVar(name, std::shared_ptr<SlsInt>(new SlsString(value.length(), &value ) ) ) );
       }
    }
    catch (std::exception& e)

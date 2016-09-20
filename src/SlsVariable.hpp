@@ -172,20 +172,25 @@ private:
    int64_t m_Value;
 };
 
-class SlsArray : public SlsInt{
+class SlsArray : public SlsInt {
 public:
-   SlsArray(int64_t Size, uint8_t* Initial = NULL) {
+   SlsArray(int64_t Size,  const uint8_t* Initial) {
       if(NULL == Initial)
       {
          SlsException e("NULL pointer exception");
          throw e;
       }
-      this->m_Value.reset(new uint8_t(Size));
+      //this->m_Values.reset(new uint8_t(Size));
+      this->m_Array = new uint8_t(Size);
       for(int64_t i = 0; i < Size; i++)
       {
-         this->m_Value.get()[i] = Initial[i];
+         this->m_Array[i] = ((uint8_t *)Initial)[i];
       }
       this->m_Size = Size;
+   }
+
+   ~SlsArray(void) {
+      delete this->m_Array;
    }
 
    SLS_STATUS get(int64_t *Size, uint8_t **Value)
@@ -195,13 +200,46 @@ public:
          return SLS_PTR_ERROR;
       }
       *Size = this->m_Size;
-      *Value = this->m_Value.get();
+      *Value = this->m_Array;
       return SLS_OK;
    }
 
 private:
-   int64_t m_Size;
-   std::shared_ptr<uint8_t> m_Value;
+   int64_t m_Size = 0;
+   uint8_t* m_Array = NULL;
+};
+
+class SlsString : public SlsInt{
+public:
+   SlsString(int64_t Size,  std::string& Initial) {
+//      if(NULL == Initial)
+//      {
+//         SlsException e("NULL pointer exception");
+//         throw e;
+//      }
+
+      this->m_String = Initial;
+      this->m_Size = Size;
+   }
+
+   ~SlsString(void) {
+      //delete this->m_String;
+   }
+
+   SLS_STATUS get(int64_t *Size, std::string* Value)
+   {
+      if((NULL == Size) || (NULL == Value))
+      {
+         return SLS_PTR_ERROR;
+      }
+      *Size = this->m_Size;
+      *Value = this->m_String;
+      return SLS_OK;
+   }
+
+private:
+   int64_t m_Size = 0;
+   std::string m_String;
 };
 
 typedef std::map<std::string, std::shared_ptr<SlsInt>> SlsVarContainer;

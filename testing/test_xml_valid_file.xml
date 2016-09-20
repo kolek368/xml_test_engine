@@ -7,4 +7,7 @@
    <set name='aaa' type='Integer'>
       <value>123</value>
    </set>
+   <set name='msg' type='String'>
+      <value>Hello, sls_variable World</value>
+   </set>
 </sls_script>

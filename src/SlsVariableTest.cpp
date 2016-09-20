@@ -79,24 +79,25 @@ TEST(SlsVariable, SlsIntVariables)
 
 TEST(SlsVariable, SlsArrays)
 {
-   uint8_t *arrayValues = new uint8_t(10);
+   const uint8_t arrayValuesSize = 25;
+   uint8_t *arrayValues = new uint8_t(arrayValuesSize);
    uint8_t *getPtr;
    int64_t getSize;
-   for(int8_t i = 0; i < 10; i++)
+   for(int8_t i = 0; i < arrayValuesSize; i++)
    {
       arrayValues[i] = 'a' + i;
    }
    EXPECT_THROW(SlsArray test1(1, NULL), SlsException);
    EXPECT_NO_THROW( SlsArray(10, new uint8_t(10) ) );
-   EXPECT_NO_THROW(SlsArray(10, arrayValues));
-   SlsArray test1(10, arrayValues);
+   EXPECT_NO_THROW(SlsArray(arrayValuesSize, arrayValues));
+   SlsArray test1(arrayValuesSize, arrayValues);
    ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, NULL));
    ASSERT_TRUE(SLS_PTR_ERROR == test1.get(&getSize, NULL));
    ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, &getPtr));
    ASSERT_TRUE(SLS_OK == test1.get(&getSize, &getPtr));
-   ASSERT_TRUE(getSize == 10);
+   ASSERT_TRUE(getSize == arrayValuesSize);
    ASSERT_FALSE(getPtr == arrayValues);
-   for(int8_t i = 0; i < 10; i++)
+   for(int8_t i = 0; i < arrayValuesSize; i++)
    {
       ASSERT_TRUE(getPtr[i] == arrayValues[i]);
    }
@@ -106,12 +107,19 @@ TEST(SlsVariable, SlsArrays)
 TEST(SlsVariable, SlsVariablesContainter)
 {
    SlsVarContainer testVariables;
-   std::shared_ptr<SlsInt> p(new SlsArray(10, new uint8_t(10) ));
+   std::shared_ptr<SlsInt> p(new SlsArray(50, new uint8_t(50) ));
    std::shared_ptr<SlsInt> q(new SlsInt(1));
    std::shared_ptr<SlsInt> r(new SlsInt(1));
+   std::string testString = "This is string test of a veeeeeeery long string adasd asdasdad asdasda asdada asdasd asdasd asdasd";
    testVariables.insert( SlsVar("Id", std::shared_ptr<SlsInt>(new SlsInt(1))) );
    testVariables.insert( SlsVar("Score", q) );
    testVariables.insert( SlsVar("Age", r) );
    testVariables.insert( SlsVar("Name", p) );
    testVariables.insert( SlsVar("Surname", std::shared_ptr<SlsInt>(new SlsArray(5, new uint8_t(5)))) );
+   SlsString s(testString.length(), testString );
+   testVariables.insert( SlsVar("Message", std::shared_ptr<SlsInt>(new SlsString(testString.length(),
+                                                                                testString ))) );
+   std::cout << "SlsVariablesContainers test end." << std::endl;
+   std::cout << "SlsVariablesContainers test end." << std::endl;
+   std::cout << "SlsVariablesContainers test end." << std::endl;
 }
