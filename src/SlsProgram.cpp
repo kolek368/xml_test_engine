@@ -8,6 +8,7 @@
 
 SlsProgram::SlsProgram(const char* libPath) {
    // TODO Auto-generated constructor stub
+   this->m_Stack = nullptr;
    this->m_ProgramReady = false;
    this->m_Libs.setPath(libPath);
 }
@@ -91,37 +92,50 @@ bool SlsProgram::parseCall(boost::property_tree::ptree::value_type &line)
    return true;
 }
 
+void SlsProgram::createVariable(std::string Name, std::string Type, std::string Value)
+{
+   if("Integer" == Type)
+   {
+      int64_t iValue = ("" == Value) ? 0 : std::stoi(Value);
+      std::cout << "Adding Integer value: " << iValue << std::endl;
+      SlsInt* pInt = new SlsInt(iValue);
+      this->m_Variables.insert( SlsVarPair(Name, pInt ));
+   }
+   else if("String" == Type)
+   {
+      std::cout << "Adding String value: " << Value << " Length: " << Value.length() << std::endl;
+      this->m_Variables.insert( SlsVarPair(Name, new SlsString( Value ) ));
+   }
+}
+
 bool SlsProgram::parseSet(boost::property_tree::ptree::value_type &line)
 {
    try
    {
       std::string name = line.second.get<std::string>("<xmlattr>.name", "not found");
       std::string type = line.second.get<std::string>("<xmlattr>.type", "not found");
-      std::string value;
       for(auto &child : line.second)
       {
-         if("<xmlattr>" == std::string(child.first.data()))
+         if("<xmlattr>" == child.first)
          {
             continue;
          }
-         else if("value" == std::string(child.first.data()))
+         else if("value" == child.first)
          {
-            value = child.second.data();
+            this->createVariable(name, type, child.second.data());
+         }
+         else if("add" == child.first)
+         {
+            if(NULL == this->m_Variables.find(name))
+            {
+               this->createVariable(name, type, "");
+            }
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            programLine->addParam("add", name, SlsVarDesc("var", child.second.data()));
+            this->m_Program.push_back(programLine);
          }
       }
 
-      std::cout << "Varable: " << name << " Type: " << type << " Value: " << value << std::endl;
-      if("Integer" == type)
-      {
-         int64_t iValue = std::stoi(value);
-         std::cout << "Adding Integer value: " << iValue << std::endl;
-         this->m_Variables.insert( SlsVar(name, std::shared_ptr<SlsInt>(new SlsInt(iValue))) );
-      }
-      else if("String" == type)
-      {
-         std::cout << "Adding String value: " << value << " Length: " << value.length() << std::endl;
-         //this->m_Variables.insert( SlsVar(name, std::shared_ptr<SlsInt>(new SlsString(value.length(), &value ) ) ) );
-      }
    }
    catch (std::exception& e)
    {
@@ -163,6 +177,13 @@ bool SlsProgram::compile(void)
       std::cout << "No script is loaded." << std::endl;
       return false;
    }
+
+   this->m_Stack = new SlsStack(MAX_SLS_SCRIPT_STACK_SIZE);
+   if(NULL == this->m_Stack)
+   {
+      return false;
+   }
+
    try
    {
       // TODO generate listing from xml file
@@ -223,7 +244,7 @@ void SlsProgram::run(void)
    {
       for(auto& entity : this->m_Program)
       {
-         entity->execute();
+         entity->execute(this->m_Stack, this->m_Variables);
       }
    }
 }

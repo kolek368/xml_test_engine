@@ -7,7 +7,17 @@
    <set name='aaa' type='Integer'>
       <value>123</value>
    </set>
+   <set name='bbb' type='Integer'>
+      <value>321</value>
+   </set>
+   <set name='ccc' type='Integer'>
+      <add>aaa</value>
+      <add>bbb</value>
+   </set>
    <set name='msg' type='String'>
       <value>Hello, sls_variable World</value>
    </set>
+   <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+      <param type='var'>msg</param>
+   </call>
 </sls_script>

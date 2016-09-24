@@ -8,7 +8,7 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
-#define private public
+//#define private public
 #include "SlsVariable.hpp"
 
 TEST(SlsVariable, SlsIntVariables)
@@ -79,7 +79,7 @@ TEST(SlsVariable, SlsIntVariables)
 
 TEST(SlsVariable, SlsArrays)
 {
-   const uint8_t arrayValuesSize = 25;
+   const uint8_t arrayValuesSize = 5;
    uint8_t *arrayValues = new uint8_t(arrayValuesSize);
    uint8_t *getPtr;
    int64_t getSize;
@@ -104,22 +104,30 @@ TEST(SlsVariable, SlsArrays)
    delete arrayValues;
 }
 
+TEST(SlsVariable, SlsString)
+{
+   std::string testString = "Test string message for testing purposes";
+   EXPECT_NO_THROW( SlsString s(testString) );
+}
+
 TEST(SlsVariable, SlsVariablesContainter)
 {
-   SlsVarContainer testVariables;
-   std::shared_ptr<SlsInt> p(new SlsArray(50, new uint8_t(50) ));
-   std::shared_ptr<SlsInt> q(new SlsInt(1));
-   std::shared_ptr<SlsInt> r(new SlsInt(1));
+   int64_t testInteger;
    std::string testString = "This is string test of a veeeeeeery long string adasd asdasdad asdasda asdada asdasd asdasd asdasd";
-   testVariables.insert( SlsVar("Id", std::shared_ptr<SlsInt>(new SlsInt(1))) );
-   testVariables.insert( SlsVar("Score", q) );
-   testVariables.insert( SlsVar("Age", r) );
-   testVariables.insert( SlsVar("Name", p) );
-   testVariables.insert( SlsVar("Surname", std::shared_ptr<SlsInt>(new SlsArray(5, new uint8_t(5)))) );
-   SlsString s(testString.length(), testString );
-   testVariables.insert( SlsVar("Message", std::shared_ptr<SlsInt>(new SlsString(testString.length(),
-                                                                                testString ))) );
-   std::cout << "SlsVariablesContainers test end." << std::endl;
-   std::cout << "SlsVariablesContainers test end." << std::endl;
-   std::cout << "SlsVariablesContainers test end." << std::endl;
+   std::string testString2;
+   uint8_t *pUintArray = new uint8_t(50);
+   SlsArray* p = new SlsArray(50, pUintArray );
+   SlsInt* q = new SlsInt(1);
+   SlsInt* r = new SlsInt(30);
+   SlsString* s = new SlsString(testString);
+   SlsVariables testVariables;
+   testVariables.insert( SlsVarPair("Score", q) );
+   testVariables.insert( SlsVarPair("Age", r) );
+   testVariables.insert( SlsVarPair("Name", p) );
+   testVariables.insert( SlsVarPair("Message", s));
+   std::cout << "Type: " << testVariables.find("Age")->type() << std::endl;
+   testVariables.get("Id", &testInteger);
+   testVariables.get("Age", &testInteger);
+   std::cout << "Age: " << testInteger << std::endl;
+   delete pUintArray;
 }

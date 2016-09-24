@@ -55,6 +55,10 @@ public:
       delete this->m_pStack;
    }
 
+   void clear(void) {
+      this->m_iStackIdx = 0;
+   }
+
    void push(uint8_t byte) {
       return this->pushn(&byte, sizeof(uint8_t));
    };

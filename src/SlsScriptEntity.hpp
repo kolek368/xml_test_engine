@@ -9,6 +9,7 @@
 #define SLSSCRIPTENTITY_HPP_
 #include <vector>
 #include "SlsLibraryApi.hpp"
+#include "SlsVariable.hpp"
 
 #define MAX_SLS_SCRIPT_STACK_SIZE   256
 
@@ -19,44 +20,16 @@ public:
    virtual SLS_STATUS init(void) {
       return SLS_OK;
    };
-   virtual void addParams(void) {};
-   virtual void execute(void) {};
+   virtual void addParam(void) {};
+   virtual SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
+      return SLS_OK;
+   };
 };
 
 class SlsCallEntity : public SlsScriptEntity {
 public:
    ~SlsCallEntity() {
-      if(NULL != this->m_Stack)
-      {
-         delete this->m_Stack;
-      }
-   }
 
-   SLS_STATUS init(void)
-   {
-      SLS_STATUS status = SLS_OK;
-      this->m_Stack = new SlsStack(MAX_SLS_SCRIPT_STACK_SIZE);
-      if(NULL == this->m_Stack)
-      {
-         status = SLS_ERROR;
-      }
-      for(auto const& value: this->m_Params)
-      {
-         if("string" == value.first)
-         {
-            try
-            {
-               uint16_t stringLen = (uint16_t)value.second.length();
-               this->m_Stack->pushn((uint8_t *)value.second.c_str(), value.second.length());
-               this->m_Stack->pushw(stringLen);
-            }
-            catch(SlsException& e)
-            {
-               return SLS_ERROR;
-            }
-         }
-      }
-      return status;
    }
 
    void addParam(SlsFunParam &param) {
@@ -67,13 +40,90 @@ public:
       this->m_Fun = fun;
    }
 
-   void execute(void) {
-      this->m_Fun(this->m_Stack);
+   SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
+      if(NULL == Stack)
+      {
+         return SLS_PTR_ERROR;
+      }
+
+      for(auto const& value: this->m_Params)
+      {
+         if("string" == value.first)
+         {
+            try
+            {
+               uint16_t stringLen = (uint16_t)value.second.length();
+               Stack->pushn((uint8_t *)value.second.c_str(), value.second.length());
+               Stack->pushw(stringLen);
+            }
+            catch(SlsException& e)
+            {
+               return SLS_ERROR;
+            }
+         }
+         else if("var" == value.first)
+         {
+            SLS_STATUS Status = Variables.push(value.second, Stack);
+            if(SLS_OK != Status) {
+               return SLS_ERROR;
+            }
+         }
+      }
+      this->m_Fun(Stack);
+      return SLS_OK;
    };
 private:
    std::vector<SlsFunParam> m_Params;
-   SlsStack *m_Stack = NULL;
    sls_lib_function m_Fun = NULL;
+};
+
+class SlsOperatorEntity : public SlsScriptEntity {
+public:
+   SlsOperatorEntity() {
+
+   };
+
+   ~SlsOperatorEntity() {
+
+   }
+
+   void addParam(std::string Operation, std::string Lvalue, SlsVarDesc Rvalue) {
+      if(this->isOperationValid(Operation)) {
+         this->m_Operation = Operation;
+         this->m_Lvalue = Lvalue;
+         this->m_Rvalue = Rvalue;
+      }
+   }
+
+   SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
+      SLS_STATUS Status = SLS_OK;
+      if("add" == this->m_Operation) {
+         if("var" == this->m_Rvalue.first) {
+            Variables.add(this->m_Lvalue, this->m_Rvalue.second);
+         }
+         else {
+            Status = SLS_INVALID_TYPE;
+         }
+      }
+      else {
+         Status = SLS_INVALID_KEY;
+      }
+      return Status;
+   }
+
+private:
+   std::string m_Operation;
+   std::string m_Lvalue;
+   SlsVarDesc m_Rvalue;
+   const std::string m_SupportedOperations[1] = { "add"};
+   bool isOperationValid(std::string Operation) {
+      for(auto &oper : this->m_SupportedOperations) {
+         if(oper == Operation) {
+            return true;
+         }
+      }
+      return false;
+   }
 };
 
 #endif /* SLSSCRIPTENTITY_HPP_ */

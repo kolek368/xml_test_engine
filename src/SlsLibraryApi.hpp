@@ -18,6 +18,9 @@ typedef enum _SLS_STATUS
    SLS_ERROR = -1,
    SLS_INVALID_PATH = -2,
    SLS_PTR_ERROR = -3,
+   SLS_NO_MEMORY = -4,
+   SLS_INVALID_TYPE = -5,
+   SLS_INVALID_KEY = -6,
 } SLS_STATUS;
 
 typedef SLS_STATUS (*sls_lib_function)(SlsStack *stack);

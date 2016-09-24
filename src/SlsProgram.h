@@ -33,11 +33,13 @@ private:
    bool parseLine(boost::property_tree::ptree::value_type &line);
    bool parseCall(boost::property_tree::ptree::value_type &line);
    bool parseSet(boost::property_tree::ptree::value_type &line);
+   void createVariable(std::string Name, std::string Type, std::string Value);
    boost::property_tree::ptree m_RawProgram;
    bool m_ProgramReady;
+   SlsStack* m_Stack;
    SlsLibManager m_Libs;
    std::vector<SlsScriptEntity *> m_Program;
-   SlsVarContainer m_Variables;
+   SlsVariables m_Variables;
 };
 
 #endif /* SLSPROGRAM_H_ */
