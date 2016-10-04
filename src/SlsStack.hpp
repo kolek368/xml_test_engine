@@ -52,7 +52,7 @@ public:
    }
    ~SlsStack()
    {
-      delete this->m_pStack;
+      delete [] this->m_pStack;
    }
 
    void clear(void) {

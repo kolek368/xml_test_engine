@@ -14,9 +14,8 @@ SlsLibManager::SlsLibManager() {
 
 SlsLibManager::~SlsLibManager() {
    // TODO Auto-generated destructor stub
-   for(std::vector<void *>::iterator it = this->m_pOpenedLibs.begin(); it != this->m_pOpenedLibs.end(); it++)
-   {
-      dlclose(*it);
+   for(auto& lib : this->m_pOpenedLibs) {
+      dlclose(lib);
    }
 }
 

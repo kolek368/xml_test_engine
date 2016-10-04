@@ -79,15 +79,29 @@ private:
 
 class SlsOperatorEntity : public SlsScriptEntity {
 public:
-   SlsOperatorEntity() {
+   typedef enum _OPERATIONS {
+      OPER_ADD = 0,
+      OPER_SUB,
+      OPER_MUL,
+      OPER_DIV,
+      OPER_MOD,
+      OPER_AND,
+      OPER_OR,
+      OPER_XOR,
+      OPER_SHL,
+      OPER_SHR,
+      OPER_MAX
+   } OPERATIONS;
 
+   SlsOperatorEntity() {
+      this->m_Operation = OPER_MAX;
    };
 
    ~SlsOperatorEntity() {
 
    }
 
-   void addParam(std::string Operation, std::string Lvalue, SlsVarDesc Rvalue) {
+   void addParam(OPERATIONS Operation, std::string Lvalue, SlsVarDesc Rvalue) {
       if(this->isOperationValid(Operation)) {
          this->m_Operation = Operation;
          this->m_Lvalue = Lvalue;
@@ -97,30 +111,102 @@ public:
 
    SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
       SLS_STATUS Status = SLS_OK;
-      if("add" == this->m_Operation) {
-         if("var" == this->m_Rvalue.first) {
-            Variables.add(this->m_Lvalue, this->m_Rvalue.second);
-         }
-         else {
-            Status = SLS_INVALID_TYPE;
-         }
-      }
-      else {
-         Status = SLS_INVALID_KEY;
+      switch (this->m_Operation) {
+         case OPER_ADD:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.add(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_SUB:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.sub(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_MUL:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.mul(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_DIV:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.div(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_MOD:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.mod(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_AND:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.land(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_OR:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.lor(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_XOR:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.lxor(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_SHR:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.shr(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         case OPER_SHL:
+            if(SlsVar::Variable == this->m_Rvalue.first) {
+               Variables.shl(this->m_Lvalue, this->m_Rvalue.second);
+            }
+            else {
+               Status = SLS_INVALID_TYPE;
+            }
+            break;
+         default:
+            Status = SLS_INVALID_KEY;
+            break;
       }
       return Status;
    }
 
 private:
-   std::string m_Operation;
+   OPERATIONS m_Operation;
    std::string m_Lvalue;
    SlsVarDesc m_Rvalue;
-   const std::string m_SupportedOperations[1] = { "add"};
-   bool isOperationValid(std::string Operation) {
-      for(auto &oper : this->m_SupportedOperations) {
-         if(oper == Operation) {
-            return true;
-         }
+   bool isOperationValid(OPERATIONS Operation) {
+      if(OPER_MAX > Operation)
+      {
+         return true;
       }
       return false;
    }

@@ -15,6 +15,10 @@ SlsProgram::SlsProgram(const char* libPath) {
 
 SlsProgram::~SlsProgram() {
    // TODO Auto-generated destructor stub
+   if(nullptr != this->m_Stack)
+   {
+      delete[] this->m_Stack;
+   }
    for(auto& entity : this->m_Program)
    {
       delete entity;
@@ -94,12 +98,16 @@ bool SlsProgram::parseCall(boost::property_tree::ptree::value_type &line)
 
 void SlsProgram::createVariable(std::string Name, std::string Type, std::string Value)
 {
+   if(NULL != this->m_Variables.find(Name))
+   {
+      return;
+   }
+
    if("Integer" == Type)
    {
       int64_t iValue = ("" == Value) ? 0 : std::stoi(Value);
-      std::cout << "Adding Integer value: " << iValue << std::endl;
-      SlsInt* pInt = new SlsInt(iValue);
-      this->m_Variables.insert( SlsVarPair(Name, pInt ));
+      std::cout << "Creating Integer value: " << iValue << std::endl;
+      this->m_Variables.insert( SlsVarPair(Name, new SlsInt(iValue) ));
    }
    else if("String" == Type)
    {
@@ -126,12 +134,72 @@ bool SlsProgram::parseSet(boost::property_tree::ptree::value_type &line)
          }
          else if("add" == child.first)
          {
-            if(NULL == this->m_Variables.find(name))
-            {
-               this->createVariable(name, type, "");
-            }
             SlsOperatorEntity *programLine = new SlsOperatorEntity();
-            programLine->addParam("add", name, SlsVarDesc("var", child.second.data()));
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_ADD, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("sub" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_SUB, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("mul" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_MUL, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("div" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_DIV, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("mod" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_MOD, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("and" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_AND, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("or" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_OR, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("xor" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_XOR, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("shr" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_SHR, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
+            this->m_Program.push_back(programLine);
+         }
+         else if("shl" == child.first)
+         {
+            SlsOperatorEntity *programLine = new SlsOperatorEntity();
+            this->createVariable(name, type, "");
+            programLine->addParam(SlsOperatorEntity::OPER_SHL, name, SlsVarDesc(SlsVar::Variable, child.second.data()));
             this->m_Program.push_back(programLine);
          }
       }
@@ -178,7 +246,7 @@ bool SlsProgram::compile(void)
       return false;
    }
 
-   this->m_Stack = new SlsStack(MAX_SLS_SCRIPT_STACK_SIZE);
+   this->m_Stack = new SlsStack[MAX_SLS_SCRIPT_STACK_SIZE];
    if(NULL == this->m_Stack)
    {
       return false;

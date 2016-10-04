@@ -40,8 +40,33 @@ TEST(SlsProgram, CompileXmlTestScriptInvalid)
 TEST(SlsProgram, BuildXmlTestScriptValid)
 {
    SlsProgram test("./testing/libs");
+   int64_t Value;
    EXPECT_TRUE( test.build("./testing/test_xml_valid_file.xml") );
    test.run();
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["aaa"])->get(&Value);
+   EXPECT_TRUE(123 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["bbb"])->get(&Value);
+   EXPECT_TRUE(321 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["ccc"])->get(&Value);
+   EXPECT_TRUE(444 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["ddd"])->get(&Value);
+   EXPECT_TRUE(111 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["eee"])->get(&Value);
+   EXPECT_TRUE(642 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["fff"])->get(&Value);
+   EXPECT_TRUE(2 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["ggg"])->get(&Value);
+   EXPECT_TRUE(79 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["hhh"])->get(&Value);
+   EXPECT_TRUE(65 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["iii"])->get(&Value);
+   EXPECT_TRUE(379 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["jjj"])->get(&Value);
+   EXPECT_TRUE(314 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["kkk"])->get(&Value);
+   EXPECT_TRUE(246 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["lll"])->get(&Value);
+   EXPECT_TRUE(123 == Value);
 }
 
 TEST(SlsProgram, BuildXmlTestScriptInvalid)

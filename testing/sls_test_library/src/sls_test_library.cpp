@@ -27,7 +27,7 @@ extern "C" SLS_STATUS TestFunPrintMsg(SlsStack *stack)
       cout << msg[i];
    }
    cout << endl;
-   delete msg;
+   delete [] msg;
    return Status;
 }
 

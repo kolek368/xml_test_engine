@@ -11,6 +11,8 @@
 //#define private public
 #include "SlsVariable.hpp"
 
+#include <exception>
+
 TEST(SlsVariable, SlsIntVariables)
 {
    SLS_STATUS Status;
@@ -79,29 +81,35 @@ TEST(SlsVariable, SlsIntVariables)
 
 TEST(SlsVariable, SlsArrays)
 {
-   const uint8_t arrayValuesSize = 5;
-   uint8_t *arrayValues = new uint8_t(arrayValuesSize);
+   uint8_t arrayValuesSize = 5;
+   uint8_t *arrayValues;
    uint8_t *getPtr;
    int64_t getSize;
-   for(int8_t i = 0; i < arrayValuesSize; i++)
-   {
-      arrayValues[i] = 'a' + i;
+   try {
+      arrayValues = new uint8_t[arrayValuesSize];
+      for(int8_t i = 0; i < arrayValuesSize; i++)
+      {
+         //arrayValues[i] = 'a' + i;
+         arrayValues[i] = 'a';
+      }
+      EXPECT_THROW(SlsArray test1(1, NULL), SlsException);
+      EXPECT_NO_THROW(SlsArray(arrayValuesSize, arrayValues));
+      SlsArray test1(arrayValuesSize, arrayValues);
+      ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, NULL));
+      ASSERT_TRUE(SLS_PTR_ERROR == test1.get(&getSize, NULL));
+      ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, &getPtr));
+      ASSERT_TRUE(SLS_OK == test1.get(&getSize, &getPtr));
+      ASSERT_TRUE(getSize == arrayValuesSize);
+      ASSERT_FALSE(getPtr == arrayValues);
+      for(int8_t i = 0; i < arrayValuesSize; i++)
+      {
+         ASSERT_TRUE(getPtr[i] == arrayValues[i]);
+      }
+      delete[] arrayValues;
    }
-   EXPECT_THROW(SlsArray test1(1, NULL), SlsException);
-   EXPECT_NO_THROW( SlsArray(10, new uint8_t(10) ) );
-   EXPECT_NO_THROW(SlsArray(arrayValuesSize, arrayValues));
-   SlsArray test1(arrayValuesSize, arrayValues);
-   ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, NULL));
-   ASSERT_TRUE(SLS_PTR_ERROR == test1.get(&getSize, NULL));
-   ASSERT_TRUE(SLS_PTR_ERROR == test1.get(NULL, &getPtr));
-   ASSERT_TRUE(SLS_OK == test1.get(&getSize, &getPtr));
-   ASSERT_TRUE(getSize == arrayValuesSize);
-   ASSERT_FALSE(getPtr == arrayValues);
-   for(int8_t i = 0; i < arrayValuesSize; i++)
-   {
-      ASSERT_TRUE(getPtr[i] == arrayValues[i]);
+   catch(std::exception& e) {
+      std::cout<< "SlsVariable::SlsArrays failed: " << e.what();
    }
-   delete arrayValues;
 }
 
 TEST(SlsVariable, SlsString)
@@ -115,7 +123,7 @@ TEST(SlsVariable, SlsVariablesContainter)
    int64_t testInteger;
    std::string testString = "This is string test of a veeeeeeery long string adasd asdasdad asdasda asdada asdasd asdasd asdasd";
    std::string testString2;
-   uint8_t *pUintArray = new uint8_t(50);
+   uint8_t *pUintArray = new uint8_t[50];
    SlsArray* p = new SlsArray(50, pUintArray );
    SlsInt* q = new SlsInt(1);
    SlsInt* r = new SlsInt(30);
@@ -129,5 +137,5 @@ TEST(SlsVariable, SlsVariablesContainter)
    testVariables.get("Id", &testInteger);
    testVariables.get("Age", &testInteger);
    std::cout << "Age: " << testInteger << std::endl;
-   delete pUintArray;
+   delete[] pUintArray;
 }

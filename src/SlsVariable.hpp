@@ -15,12 +15,13 @@
 
 class SlsVar {
 public:
-   typedef enum _Type {
+   typedef enum _TYPE {
       Base = 0,
       Integer,
       Array,
       String,
-   } Type;
+      Variable,
+   } TYPE;
 
    SlsVar() {
       this->m_Type = Base;
@@ -30,7 +31,7 @@ public:
 
    }
 
-   Type type(void) {
+   TYPE type(void) {
       return this->m_Type;
    }
 
@@ -46,39 +47,39 @@ public:
       return SLS_OK;
    }
 
-   virtual SLS_STATUS sub(std::string Rvalue) {
+   virtual SLS_STATUS sub(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS mul(std::string Rvalue) {
+   virtual SLS_STATUS mul(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS div(std::string Rvalue) {
+   virtual SLS_STATUS div(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS mod(std::string Rvalue) {
+   virtual SLS_STATUS mod(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS land(std::string Rvalue) {
+   virtual SLS_STATUS land(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS lor(std::string Rvalue) {
+   virtual SLS_STATUS lor(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS lxor(std::string Rvalue) {
+   virtual SLS_STATUS lxor(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS shl(std::string Rvalue) {
+   virtual SLS_STATUS shl(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
-   virtual SLS_STATUS shr(std::string Rvalue) {
+   virtual SLS_STATUS shr(SlsVar* Rvalue) {
       return SLS_OK;
    }
 
@@ -113,7 +114,7 @@ public:
    }
 
 protected:
-   Type m_Type;
+   TYPE m_Type;
 };
 
 class SlsInt : public SlsVar{
@@ -147,6 +148,132 @@ public:
       {
          SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
          this->m_Value += pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS sub(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value -= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS mul(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value *= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS div(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value /= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS mod(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value %= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS land(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value &= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS lor(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value |= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS lxor(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value ^= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS shr(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value >>= pInt->m_Value;
+      }
+      return Status;
+   }
+
+   SLS_STATUS shl(SlsVar* Rvalue) {
+      SLS_STATUS Status = SLS_OK;
+      if(NULL == Rvalue)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         SlsInt* pInt = static_cast<SlsInt *>(Rvalue);
+         this->m_Value <<= pInt->m_Value;
       }
       return Status;
    }
@@ -297,21 +424,23 @@ private:
 
 class SlsArray : public SlsVar {
 public:
-   SlsArray(int64_t Size,  const uint8_t* Initial) {
+   SlsArray(int64_t Size,  const uint8_t Initial[]) {
       if(NULL == Initial)
       {
          SlsException e("NULL pointer exception");
          throw e;
       }
+      this->m_Array = new uint8_t [Size];
       for(int64_t i = 0; i < Size; i++)
       {
-         this->m_Array[i] = ((uint8_t *)Initial)[i];
+         this->m_Array[i] = Initial[i];
       }
       this->m_Size = Size;
       this->m_Type = SlsVar::Array;
    }
 
    ~SlsArray(void) {
+      delete[] this->m_Array;
    }
 
    SLS_STATUS get(int64_t *Size, uint8_t **Value)
@@ -327,7 +456,7 @@ public:
 
 private:
    int64_t m_Size = 0;
-   uint8_t m_Array[1024];
+   uint8_t* m_Array;
 };
 
 class SlsString : public SlsVar {
@@ -372,7 +501,7 @@ private:
 
 typedef std::map<std::string, SlsVar*> SlsVarContainer;
 typedef std::pair<std::string, SlsVar*> SlsVarPair;
-typedef std::pair<std::string, std::string> SlsVarDesc;
+typedef std::pair<SlsVar::TYPE, std::string> SlsVarDesc;
 
 class SlsVariables {
 public:
@@ -446,39 +575,174 @@ public:
    }
 
    SLS_STATUS sub(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->sub(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS mul(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->mul(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS div(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->div(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS mod(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->mod(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS land(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->land(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS lor(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->lor(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS lxor(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->lxor(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS shl(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->shl(pRval);
+      }
+      return Status;
    }
 
    SLS_STATUS shr(std::string Lvalue, std::string Rvalue) {
-      return SLS_OK;
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pLval = this->find(Lvalue);
+      SlsVar *pRval = this->find(Rvalue);
+      if( (NULL ==pLval) || (NULL == pRval))
+      {
+         Status  = SLS_INVALID_KEY;
+      }
+      else if(pLval->type() != pRval->type())
+      {
+         Status = SLS_INVALID_TYPE;
+      }
+      else
+      {
+         pLval->shr(pRval);
+      }
+      return Status;
    }
 
    // ==

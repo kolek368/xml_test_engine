@@ -4,6 +4,9 @@
    <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
       <param type='string'>Hello, sls_engine World!!!</param>
    </call>
+   <set name='zzz' type='Integer'>
+      <value>1</value>
+   </set>
    <set name='aaa' type='Integer'>
       <value>123</value>
    </set>
@@ -11,8 +14,44 @@
       <value>321</value>
    </set>
    <set name='ccc' type='Integer'>
-      <add>aaa</value>
-      <add>bbb</value>
+      <add>aaa</add>
+      <add>bbb</add>
+   </set>
+   <set name='ddd' type='Integer'>
+      <value>432</value>
+      <sub>bbb</sub>
+   </set>
+   <set name='eee' type='Integer'>
+      <value>2</value>
+      <mul>bbb</mul>
+   </set>
+   <set name='fff' type='Integer'>
+      <value>642</value>
+      <div>bbb</div>
+   </set>
+   <set name='ggg' type='Integer'>
+      <value>400</value>
+      <mod>bbb</mod>
+   </set>
+   <set name='hhh' type='Integer'>
+      <value>123</value>
+      <and>bbb</and>
+   </set>
+   <set name='iii' type='Integer'>
+      <value>123</value>
+      <or>bbb</or>
+   </set>
+   <set name='jjj' type='Integer'>
+      <value>123</value>
+      <xor>bbb</xor>
+   </set>
+   <set name='kkk' type='Integer'>
+      <value>123</value>
+      <shl>zzz</shl>
+   </set>
+   <set name='lll' type='Integer'>
+      <value>246</value>
+      <shr>zzz</shr>
    </set>
    <set name='msg' type='String'>
       <value>Hello, sls_variable World</value>
