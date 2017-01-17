@@ -67,6 +67,13 @@ TEST(SlsProgram, BuildXmlTestScriptValid)
    EXPECT_TRUE(246 == Value);
    static_cast<SlsInt*>(test.m_Variables.m_Variables["lll"])->get(&Value);
    EXPECT_TRUE(123 == Value);
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["factorial_result"])->get(&Value);
+   EXPECT_TRUE(720 == Value);
+   std::cout << "Factorial result: " << Value << std::endl;
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["hexval"])->get(&Value);
+   std::cout << "Hexval result: " << Value << std::endl;
+   static_cast<SlsInt*>(test.m_Variables.m_Variables["hexval2"])->get(&Value);
+   std::cout << "Hexval result: " << Value << std::endl;
 }
 
 TEST(SlsProgram, BuildXmlTestScriptInvalid)

@@ -31,9 +31,10 @@ private:
    bool load(const char* path);
    bool compile(void);
    bool parseLine(boost::property_tree::ptree::value_type &line);
-   bool parseCall(boost::property_tree::ptree::value_type &line);
-   bool parseSet(boost::property_tree::ptree::value_type &line);
-   void createVariable(std::string Name, std::string Type, std::string Value);
+   bool parseCall(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
+   bool parseSet(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
+   bool parseIf(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
+   SLS_STATUS createVariable(std::string Name, std::string Type, std::string Value);
    boost::property_tree::ptree m_RawProgram;
    bool m_ProgramReady;
    SlsStack* m_Stack;

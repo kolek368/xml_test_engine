@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sls_script SYSTEM "sls_script.dtd">
+<if syntaxok='true' expected='aaa = bbb'>
+   <condition>
+      <equal lvar='aaa' rvar='bbb'/>
+   </condition>
+   <true>
+   </true>
+   <false>
+   </false>
+</if>
+<if syntaxok='true' expected='aaa > bbb'>
+   <condition>
+      <more lvar='aaa' rvar='bbb'/>
+   </condition>
+   <true>
+   </true>
+   <false>
+   </false>
+</if>
+<if syntaxok='true' expected='aaa < bbb'>
+   <condition>
+      <less lvar='aaa' rvar='bbb'/>
+   </condition>
+   <true>
+   </true>
+   <false>
+   </false>
+</if>

@@ -39,7 +39,13 @@ public:
       return SLS_OK;
    }
 
-   virtual SLS_STATUS push(SlsStack *Stack) {
+   // push variable on stack
+   virtual SLS_STATUS push(SlsStack* Stack) {
+      return SLS_OK;
+   }
+
+   // pop variable from stack
+   virtual SLS_STATUS pop(SlsStack* Stack) {
       return SLS_OK;
    }
 
@@ -137,6 +143,16 @@ public:
       return SLS_OK;
    }
 
+   SLS_STATUS pop(SlsStack* Stack) {
+      SLS_STATUS Status = SLS_OK;
+      uint32_t iValue;
+      Stack->popd(&iValue);
+      if(SLS_OK == Status)
+      {
+         this->m_Value = iValue;
+      }
+      return Status;
+   }
 
    SLS_STATUS add(SlsVar* Rvalue) {
       SLS_STATUS Status = SLS_OK;

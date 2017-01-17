@@ -61,6 +61,18 @@ public:
                return SLS_ERROR;
             }
          }
+         else if("dword" == value.first)
+         {
+            try
+            {
+               uint32_t iValue = ("" == value.second) ? 0 : std::stoi(value.second);
+               Stack->pushd(iValue);
+            }
+            catch(SlsException& e)
+            {
+               return SLS_ERROR;
+            }
+         }
          else if("var" == value.first)
          {
             SLS_STATUS Status = Variables.push(value.second, Stack);
@@ -210,6 +222,114 @@ private:
       }
       return false;
    }
+};
+
+class SlsResultEntity : public SlsScriptEntity {
+public:
+   SlsResultEntity() { };
+   ~SlsResultEntity(){ };
+   SLS_STATUS init(void) {
+      return SLS_OK;
+   };
+   void addParam(std::string Name) {
+      this->m_Name = Name;
+   };
+   SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
+      SLS_STATUS Status = SLS_OK;
+      SlsVar *pVar = Variables.find(this->m_Name);
+      if(NULL == pVar)
+      {
+         Status = SLS_PTR_ERROR;
+      }
+      else
+      {
+         switch (pVar->type()) {
+            case SlsVar::Integer:
+               Status = pVar->pop(Stack);
+               break;
+            default:
+               break;
+         }
+      }
+      return Status;
+   };
+private:
+   std::string m_Name;
+};
+
+class SlsIfEntity : public SlsScriptEntity {
+public:
+   SlsIfEntity() { };
+   ~SlsIfEntity() { };
+
+   void addTrueFalse(SlsScriptEntity *Next, bool Branch) {
+      if(Branch) {
+         this->m_True.push_back(Next);
+      }
+      else {
+         this->m_False.push_back(Next);
+      }
+   };
+
+   SLS_STATUS execute(SlsStack *Stack, SlsVariables &Variables) {
+      SLS_STATUS Status = SLS_OK;
+      std::vector<SlsScriptEntity *> *path = NULL;
+      if(this->checkCondition())
+      {
+         path = &this->m_True;
+      }
+      else
+      {
+         path = &this->m_False;
+      }
+      for(auto& entity : *path)
+      {
+         entity->execute(Stack, Variables);
+      }
+      return Status;
+   }
+
+   SLS_STATUS parse(boost::property_tree::ptree &iftree) {
+      SLS_STATUS Status = SLS_OK;
+      for(auto& child : iftree)
+      {
+         if("<xmlattr>" == child.first)
+         {
+            continue;
+         }
+         std::cout << child.first << std::endl;
+         if("condition" == child.first)
+         {
+            std::cout << "Parsing condition statement" << std::endl;
+         }
+         else if("true" == child.first)
+         {
+            std::cout << "Parsing true statement" << std::endl;
+         }
+         else if("false" == child.first)
+         {
+            std::cout << "Parsing true statement" << std::endl;
+         }
+         else
+         {
+            Status = SLS_ERROR;
+         }
+      }
+      return Status;
+   }
+
+   std::string toString(void) {
+      return this->m_sCondition;
+   }
+private:
+   bool checkCondition(void) {
+      bool result = true;
+      //TODO stub have to add checking condition of this if statement
+      return result;
+   }
+   std::vector<SlsScriptEntity *> m_True;
+   std::vector<SlsScriptEntity *> m_False;
+   std::string m_sCondition;
 };
 
 #endif /* SLSSCRIPTENTITY_HPP_ */

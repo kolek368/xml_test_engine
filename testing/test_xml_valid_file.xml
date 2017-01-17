@@ -59,4 +59,14 @@
    <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
       <param type='var'>msg</param>
    </call>
+   <call lib='libsls_test_library.so' function='TestFunFactorial'>
+      <param type='dword'>6</param>
+      <result name='factorial_result' type='Integer'></result>
+   </call>
+   <set name='hexval' type='Integer'>
+      <value>0xAA</value>
+   </set>
+   <set name='hexval2' type='Integer'>
+      <value>0xBB</value>
+   </set>
 </sls_script>

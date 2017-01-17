@@ -74,6 +74,20 @@ extern "C" SLS_STATUS TestFunReadArray(SlsStack *stack)
    return Status;
 }
 
+extern "C" SLS_STATUS TestFunFactorial(SlsStack *stack)
+{
+   SLS_STATUS Status = SLS_OK;
+   uint32_t value;
+   uint32_t result = 1;
+   stack->popd(&value);
+   while(value > 1) {
+      result *= value;
+      value -= 1;
+   }
+   stack->pushd(result);
+   return Status;
+}
+
 extern "C" std::string GetLibraryNamespace(void)
 {
    return std::string(LibraryNamespace);
@@ -87,6 +101,7 @@ extern "C" SLS_STATUS GetApiList(SlsLibApi *api)
    api->insert(SlsLibFun("TestFunPrintAdd", TestFunPrintAdd));
    api->insert(SlsLibFun("TestFunFillArray", TestFunFillArray));
    api->insert(SlsLibFun("TestFunReadArray", TestFunReadArray));
+   api->insert(SlsLibFun("TestFunFactorial", TestFunFactorial));
    return Status;
 }
 
