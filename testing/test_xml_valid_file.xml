@@ -69,4 +69,19 @@
    <set name='hexval2' type='Integer'>
       <value>0xBB</value>
    </set>
+   <if>
+      <condition>
+         <equal lvar='aaa' rvar='bbb'/>
+      </condition>
+      <true>
+         <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+            <param type='string'>_IF_TEST_ aaa == bbb</param>
+         </call>
+      </true>
+      <false>
+         <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+            <param type='string'>_IF_TEST_ aaa != bbb</param>
+         </call>
+      </false>
+   </if>
 </sls_script>

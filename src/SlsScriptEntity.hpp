@@ -259,15 +259,17 @@ private:
 
 class SlsIfEntity : public SlsScriptEntity {
 public:
-   SlsIfEntity() { };
+   SlsIfEntity() {
+      this->m_sCondition = "";
+   };
    ~SlsIfEntity() { };
 
-   void addTrueFalse(SlsScriptEntity *Next, bool Branch) {
+   std::vector<SlsScriptEntity *>& getTrueFalse(bool Branch) {
       if(Branch) {
-         this->m_True.push_back(Next);
+         return this->m_True;
       }
       else {
-         this->m_False.push_back(Next);
+         return this->m_False;
       }
    };
 
@@ -291,24 +293,24 @@ public:
 
    SLS_STATUS parse(boost::property_tree::ptree &iftree) {
       SLS_STATUS Status = SLS_OK;
+      this->m_sCondition = "";
       for(auto& child : iftree)
       {
          if("<xmlattr>" == child.first)
          {
             continue;
          }
-         std::cout << child.first << std::endl;
          if("condition" == child.first)
          {
-            std::cout << "Parsing condition statement" << std::endl;
+            parseCondition(child.second);
          }
          else if("true" == child.first)
          {
-            std::cout << "Parsing true statement" << std::endl;
+            continue;
          }
          else if("false" == child.first)
          {
-            std::cout << "Parsing true statement" << std::endl;
+            continue;
          }
          else
          {
@@ -322,14 +324,121 @@ public:
       return this->m_sCondition;
    }
 private:
+   typedef enum _COMPARE_OPRATOR {
+      COMPARE_EQUAL = 0,
+      COMPARE_NEQUAL,
+      COMPARE_MORE,
+      COMPARE_LESS,
+      COMPARE_INVALID,
+   } COMPARE_OPERATOR;
+   class IfEntity {
+      public:
+         IfEntity() {
+            this->m_Operator = COMPARE_INVALID;
+            this->m_Left = NULL;
+            this->m_Right = NULL;
+         }
+         ~IfEntity() {
+            if(NULL != this->m_Left) delete this->m_Left;
+            if(NULL != this->m_Right) delete this->m_Right;
+            for(auto& entity : this->m_Nested)
+            {
+               delete entity;
+            }
+         }
+         bool evaluate() {
+            return true;
+         }
+      private:
+         COMPARE_OPERATOR m_Operator;
+         SlsVar* m_Left;
+         SlsVar* m_Right;
+         std::vector<IfEntity *> m_Nested;
+
+   };
    bool checkCondition(void) {
       bool result = true;
       //TODO stub have to add checking condition of this if statement
       return result;
    }
+
+   bool parseCompare(COMPARE_OPERATOR CompType, boost::property_tree::ptree &iftree)
+   {
+      bool result = true;
+      int nvar = 0;
+      const static char *CompOperator[] = {
+            " == ",
+            " != ",
+            " > ",
+            " < "
+      };
+      std::cout << "Parsing COMPARE statement" << std::endl;
+      std::string lvar = iftree.get<std::string>("<xmlattr>.lvar", "");
+      std::string lval = iftree.get<std::string>("<xmlattr>.lval", "");
+      std::string rvar = iftree.get<std::string>("<xmlattr>.rvar", "");
+      std::string rval = iftree.get<std::string>("<xmlattr>.rval", "");
+      std::string *l;
+      std::string *r;
+      if("" != lvar)
+      {
+         l = &lvar;
+         nvar += 1;
+      }
+      if("" != lval)
+      {
+         l = &lval;
+         nvar += 1;
+      }
+      if("" != rvar)
+      {
+         r = &rvar;
+         nvar += 1;
+      }
+      if("" != rval)
+      {
+         r = &rval;
+         nvar += 1;
+      }
+
+      if(2 != nvar) {
+         result = false;
+      }
+      else {
+         this->m_sCondition += *l + CompOperator[CompType] + *r;
+      }
+      std::cout << "Parsing EQUAL statement finished." << std::endl;
+      return result;
+   }
+
+   bool parseCondition(boost::property_tree::ptree &iftree) {
+      bool result = true;
+      std::cout << "Parsing CONDITION statement" << std::endl;
+      for(auto& child : iftree) {
+         if("equal" == child.first)
+         {
+            parseCompare(COMPARE_EQUAL, child.second);
+         }
+         else if("nequal" == child.first)
+         {
+            parseCompare(COMPARE_NEQUAL, child.second);
+         }
+         else if("more" == child.first)
+         {
+            parseCompare(COMPARE_MORE, child.second);
+         }
+         else if("less" == child.first)
+         {
+            parseCompare(COMPARE_LESS, child.second);
+         }
+      }
+      std::cout << "Parsing CONDITION statement finished." << std::endl;
+      return result;
+   }
+
    std::vector<SlsScriptEntity *> m_True;
    std::vector<SlsScriptEntity *> m_False;
    std::string m_sCondition;
+   IfEntity m_eCondition;
 };
 
 #endif /* SLSSCRIPTENTITY_HPP_ */

@@ -237,6 +237,7 @@ bool SlsProgram::parseIf(boost::property_tree::ptree::value_type &line, std::vec
    bool Retval = true;
    try
    {
+      SlsIfEntity *programLine = new SlsIfEntity();
       std::cout << "Parsing IF statement." << std::endl;
       for(auto &child : line.second)
       {
@@ -259,6 +260,44 @@ bool SlsProgram::parseIf(boost::property_tree::ptree::value_type &line, std::vec
             }
             std::cout << "Parsing CONDITION finished." << std::endl;
          }
+         else if("true" == child.first)
+         {
+            std::cout << "Parsing TRUE branch." << std::endl;
+            BOOST_FOREACH(boost::property_tree::ptree::value_type &v, child.second)
+            {
+               std::cout << v.first.data() << std::endl;
+               bool result = parseLine(v, programLine->getTrueFalse(true));
+               if(false == result)
+               {
+                  Retval = false;
+                  break;
+               }
+            }
+            std::cout << "Parsing TRUE branch finished." << std::endl;
+         }
+         else if("false" == child.first)
+         {
+            std::cout << "Parsing FALSE branch." << std::endl;
+            BOOST_FOREACH(boost::property_tree::ptree::value_type &v, child.second)
+            {
+               std::cout << v.first.data() << std::endl;
+               bool result = parseLine(v, programLine->getTrueFalse(false));
+               if(false == result)
+               {
+                  Retval = false;
+                  break;
+               }
+            }
+            std::cout << "Parsing FALSE branch finished." << std::endl;
+         }
+      }
+      if(true == Retval)
+      {
+         prog.push_back(programLine);
+      }
+      else
+      {
+         delete programLine;
       }
       std::cout << "Parsing IF statement finished." << std::endl;
    }
@@ -270,20 +309,20 @@ bool SlsProgram::parseIf(boost::property_tree::ptree::value_type &line, std::vec
    return Retval;
 }
 
-bool SlsProgram::parseLine(boost::property_tree::ptree::value_type &line)
+bool SlsProgram::parseLine(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog)
 {
    bool Retval = true;
    if("call" == std::string(line.first.data()))
    {
-      Retval = this->parseCall(line, this->m_Program);
+      Retval = this->parseCall(line, prog);
    }
    else if("set" == std::string(line.first.data()))
    {
-      Retval = this->parseSet(line, this->m_Program);
+      Retval = this->parseSet(line, prog);
    }
    else if("if" == std::string(line.first.data()))
    {
-      Retval = this->parseIf(line, this->m_Program);
+      Retval = this->parseIf(line, prog);
    }
    else
    {
@@ -318,7 +357,7 @@ bool SlsProgram::compile(void)
    {
       BOOST_FOREACH(boost::property_tree::ptree::value_type &v, this->m_RawProgram.get_child("sls_script"))
       {
-         bool result = parseLine(v);
+         bool result = parseLine(v, this->m_Program);
          if(false == result)
          {
             return result;

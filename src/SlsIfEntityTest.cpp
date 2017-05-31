@@ -44,6 +44,7 @@ TEST(SlsIfEntity, TestConditionParsing_1)
             SLS_STATUS result = test.parse(child.second);
             std::string parsed = test.toString();
             EXPECT_TRUE(result == syntax);
+            EXPECT_TRUE(parsed == expected);
             std::cout << "<!-----------------!>" << std::endl;
          }
       }

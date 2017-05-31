@@ -1,8 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE sls_script SYSTEM "sls_script.dtd">
-<if syntaxok='true' expected='aaa = bbb'>
+<if syntaxok='true' expected='aaa == bbb'>
    <condition>
       <equal lvar='aaa' rvar='bbb'/>
+   </condition>
+   <true>
+      <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+         <param type='string'>aaa == bbb</param>
+      </call>
+   </true>
+   <false>
+      <call lib='libsls_test_library.so' function='TestFunPrintMsg'>
+         <param type='string'>aaa != bbb</param>
+      </call>
+   </false>
+</if>
+<if syntaxok='true' expected='aaa != bbb'>
+   <condition>
+      <nequal lvar='aaa' rvar='bbb'/>
    </condition>
    <true>
    </true>

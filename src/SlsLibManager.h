@@ -9,6 +9,7 @@
 #define SLSLIBMANAGER_H_
 
 #include <dlfcn.h>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <boost/filesystem.hpp>

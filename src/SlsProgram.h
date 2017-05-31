@@ -30,7 +30,7 @@ public:
 private:
    bool load(const char* path);
    bool compile(void);
-   bool parseLine(boost::property_tree::ptree::value_type &line);
+   bool parseLine(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
    bool parseCall(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
    bool parseSet(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
    bool parseIf(boost::property_tree::ptree::value_type &line, std::vector<SlsScriptEntity *> &prog);
